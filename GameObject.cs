@@ -1,13 +1,15 @@
 namespace rouge_sharp;
 
-internal class GameObject {
+internal class GameObject
+{
     public Point Position { get; private set; }
-    public ColoredGlyph Appearance { get ; set; }
+    public ColoredGlyph Appearance { get; set; }
     public int Health { get; set; }
 
     private ColoredGlyph _mapAppearance = new ColoredGlyph();
 
-    public GameObject(ColoredGlyph appearance, Point position, IScreenSurface hostingSurface) {
+    public GameObject(ColoredGlyph appearance, Point position, IScreenSurface hostingSurface)
+    {
         Appearance = appearance;
         Position = position;
 
@@ -22,7 +24,7 @@ internal class GameObject {
         screenSurface.IsDirty = true;
     }
 
-    public bool Move(Point newPosition, Map map) 
+    public bool Move(Point newPosition, Map map)
     {
         // Check new position is valid
         if (!map.SurfaceObject.IsValidCell(newPosition.X, newPosition.Y)) return false;

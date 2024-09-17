@@ -27,8 +27,8 @@ class RootScreen : ScreenObject
     {
         base.Render(delta);
 
-          _hudSurface.Surface.Print(1, 1, $"Health: {_map.UserControlledObject.Health}", Color.White);
-          _hudSurface.Surface.Print(1, 2, $"Money: {_map.UserControlledObject.Money}", Color.Yellow);
+        _hudSurface.Surface.Print(1, 1, $"Health: {_map.UserControlledObject.Health}", Color.White);
+        _hudSurface.Surface.Print(1, 2, $"Money: {_map.UserControlledObject.Money}", Color.Yellow);
     }
 
     public override bool ProcessKeyboard(Keyboard keyboard)
@@ -57,7 +57,8 @@ class RootScreen : ScreenObject
             handled = true;
         }
 
-        if (keyboard.IsKeyPressed(Keys.Escape)) {
+        if (keyboard.IsKeyPressed(Keys.Escape))
+        {
             // Todo: at some point this will pause/go to a menu, but for now close
             Environment.Exit(0);
         }

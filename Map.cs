@@ -4,7 +4,7 @@ using sharp_rouge.entities;
 
 namespace rouge_sharp;
 
-internal class Map 
+internal class Map
 {
     private List<GameObject> _mapObjects;
     private ScreenSurface _mapSurface;
@@ -37,7 +37,7 @@ internal class Map
         UserControlledObject.Health = 10;
     }
 
-    
+
 
     // private void FillBackground() {
     //     // Color[] colors = new[] { Color.LightGreen, Color.Coral, Color.CornflowerBlue, Color.DarkGreen };
@@ -54,9 +54,9 @@ internal class Map
 
     private void CreateTreasure(Room room)
     {
-        for (int i = 0; i < 1000; i++) 
+        for (int i = 0; i < 1000; i++)
         {
-            Point randomPosition = new (Game.Instance.Random.Next(room.startingPos.X, room.startingPos.X + room.Width),
+            Point randomPosition = new(Game.Instance.Random.Next(room.startingPos.X, room.startingPos.X + room.Width),
                                         Game.Instance.Random.Next(room.startingPos.Y, room.startingPos.Y + room.Height));
 
             bool foundObject = _mapObjects.Any(obj => obj.Position == randomPosition);
@@ -88,7 +88,7 @@ internal class Map
     //     }
     // }
 
-    public bool TryGetMapObject(Point position, [NotNullWhen(true)] out GameObject? gameObject) 
+    public bool TryGetMapObject(Point position, [NotNullWhen(true)] out GameObject? gameObject)
     {
         foreach (var otherGameObject in _mapObjects)
         {
@@ -108,7 +108,8 @@ internal class Map
                 return true;
             }
 
-            if (otherGameObject.Position == position && otherGameObjectType == typeof(Wall)) {
+            if (otherGameObject.Position == position && otherGameObjectType == typeof(Wall))
+            {
                 gameObject = otherGameObject;
                 return true;
             }
