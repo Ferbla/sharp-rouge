@@ -10,13 +10,6 @@ internal class Wall : GameObject
 
     public override bool Touched(GameObject source, Map map)
     {
-        // if (source == map.UserControlledObject)
-        // {
-        //     map.UserControlledObject.Money += _value;
-        //     map.RemoveMapObject(this);
-        //     return true;
-        // }
-
         return false;
     }
 }

@@ -17,10 +17,12 @@ internal class Map
 
     public Map(int mapWidth, int mapHeight)
     {
-        _mapObjects = new List<GameObject>();
+        _mapObjects = [];
 
-        _mapSurface = new ScreenSurface(mapWidth, mapHeight);
-        _mapSurface.UseMouse = false;
+        _mapSurface = new ScreenSurface(mapWidth, mapHeight)
+        {
+            UseMouse = false
+        };
 
         // GenerateRoom();
         var room = new Room(_mapSurface, _mapObjects);

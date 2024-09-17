@@ -3,16 +3,15 @@ namespace rouge_sharp;
 internal class GameObject {
     public Point Position { get; private set; }
     public ColoredGlyph Appearance { get ; set; }
-
     public int Health { get; set; }
 
     private ColoredGlyph _mapAppearance = new ColoredGlyph();
 
-    public GameObject(ColoredGlyph appearance, Point positioin, IScreenSurface hostingSurface) {
+    public GameObject(ColoredGlyph appearance, Point position, IScreenSurface hostingSurface) {
         Appearance = appearance;
-        Position = positioin;
+        Position = position;
 
-        hostingSurface.Surface[positioin].CopyAppearanceTo(_mapAppearance);
+        hostingSurface.Surface[position].CopyAppearanceTo(_mapAppearance);
 
         DrawGameObject(hostingSurface);
     }

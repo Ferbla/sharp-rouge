@@ -3,7 +3,7 @@ namespace rouge_sharp.entities;
 
 internal class Treasure : GameObject
 {
-    private int _value = 1;
+    private int _value;
 
     public Treasure(Point position, IScreenSurface hostingSurface, int value) : base(new ColoredGlyph(Color.Yellow, Color.Black, 'C'), position, hostingSurface)
     {

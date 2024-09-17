@@ -12,7 +12,7 @@ internal class Room
     private IScreenSurface _hostingSurface;
     private List<GameObject> _mapObjects;
 
-    private List<Point> _wallPoints = new List<Point>();
+    private List<Point> _wallPoints = [];
 
     public Room(IScreenSurface hostingSurface, List<GameObject> mapObjects)
     {

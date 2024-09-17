@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using rouge_sharp;
+using SadConsole.Components;
 using SadConsole.Input;
 
 namespace sharp_rouge;
@@ -8,20 +9,26 @@ namespace sharp_rouge;
 class RootScreen : ScreenObject
 {
     private Map _map;
+    private ScreenSurface _hudSurface;
 
     public RootScreen()
     {
         _map = new Map(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY - 5);
 
+        _hudSurface = new ScreenSurface(Game.Instance.ScreenCellsX, 5);
+        _hudSurface.Surface.DefaultBackground = Color.Purple;
+        _hudSurface.Position = new Point(0, Game.Instance.ScreenCellsY - 5);
+
         Children.Add(_map.SurfaceObject);
+        Children.Add(_hudSurface);
     }
 
     public override void Render(TimeSpan delta)
     {
         base.Render(delta);
 
-          _map.SurfaceObject.Surface.Print(1, 1, $"Health: {_map.UserControlledObject.Health}", Color.White);
-          _map.SurfaceObject.Surface.Print(1, 2, $"Money: {_map.UserControlledObject.Money}", Color.Yellow);
+          _hudSurface.Surface.Print(1, 1, $"Health: {_map.UserControlledObject.Health}", Color.White);
+          _hudSurface.Surface.Print(1, 2, $"Money: {_map.UserControlledObject.Money}", Color.Yellow);
     }
 
     public override bool ProcessKeyboard(Keyboard keyboard)
