@@ -1,7 +1,4 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using rouge_sharp;
-using SadConsole.Components;
+﻿using rouge_sharp;
 using SadConsole.Input;
 
 namespace sharp_rouge;

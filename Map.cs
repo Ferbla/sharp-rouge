@@ -6,7 +6,7 @@ namespace rouge_sharp;
 
 internal class Map
 {
-    private List<GameObject> _mapObjects;
+    private List<GameObject> _mapObjects = [];
     private ScreenSurface _mapSurface;
 
     public IReadOnlyList<GameObject> GameObjects => _mapObjects.AsReadOnly();
@@ -17,17 +17,15 @@ internal class Map
 
     public Map(int mapWidth, int mapHeight)
     {
-        _mapObjects = [];
-
         _mapSurface = new ScreenSurface(mapWidth, mapHeight)
         {
             UseMouse = false
         };
 
-        // GenerateRoom();
-        var room = new Room(_mapSurface, _mapObjects);
+        var room = new Room(_mapSurface, _mapObjects, true);
+        var room2 = new Room(_mapSurface, _mapObjects, false);
 
-        // FillBackground();
+        ConnectRooms(room, room2);
 
         UserControlledObject = new Player(new ColoredGlyph(Color.White, Color.Black, 2), _mapSurface.Surface.Area.Center, _mapSurface);
 
@@ -37,20 +35,35 @@ internal class Map
         UserControlledObject.Health = 10;
     }
 
+    private void ConnectRooms(Room room1, Room room2)
+    {
+        var rect1 = new Rectangle(room1.startingPos.X,
+                                  room1.startingPos.Y,
+                                  room1.Width,
+                                  room1.Height);
 
 
-    // private void FillBackground() {
-    //     // Color[] colors = new[] { Color.LightGreen, Color.Coral, Color.CornflowerBlue, Color.DarkGreen };
-    //     // float[] colorStops = new[] { 0f, 0.35f, 0.75f, 1f };
+        var rect2 = new Rectangle(room2.startingPos.X,
+                                  room2.startingPos.Y,
+                                  room2.Width,
+                                  room2.Height);
 
-    //     // Algorithms.GradientFill(_mapSurface.FontSize,
-    //     //                         _mapSurface.Surface.Area.Center,
-    //     //                         _mapSurface.Surface.Width / 3,
-    //     //                         45,
-    //     //                         _mapSurface.Surface.Area,
-    //     //                         new Gradient(colors, colorStops),
-    //     //                         (x, y, color) => _mapSurface.Surface[x, y].Background = color);
-    // }
+        for (int x = Math.Min(rect1.Center.X, rect2.Center.X); x <= Math.Max(rect1.Center.X, rect2.Center.X); x++)
+        {
+
+            _mapObjects.Add(new Wall(new Point(x, rect1.Center.Y + 1), _mapSurface));
+            RemoveMapObject(_mapObjects.Find(o => o.Position.X == x && o.Position.Y == rect1.Center.Y));
+            _mapObjects.Add(new Wall(new Point(x, rect1.Center.Y - 1), _mapSurface));
+        }
+
+        for (int y = Math.Min(rect1.Center.Y, rect2.Center.Y); y <= Math.Max(rect1.Center.Y, rect2.Center.Y); y++)
+        {
+            _mapObjects.Add(new Wall(new Point(rect2.Center.X + 1, y), _mapSurface));
+            // RemoveMapObject(_mapObjects.Find(x => x.Position.X == r))
+            _mapObjects.Add(new Wall(new Point(rect2.Center.Y - 1, y), _mapSurface));
+
+        }
+    }
 
     private void CreateTreasure(Room room)
     {
@@ -121,6 +134,8 @@ internal class Map
 
     public void RemoveMapObject(GameObject mapObject)
     {
+        if (mapObject == null) return;
+
         if (_mapObjects.Contains(mapObject))
         {
             _mapObjects.Remove(mapObject);

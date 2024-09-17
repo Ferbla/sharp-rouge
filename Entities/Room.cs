@@ -14,12 +14,12 @@ internal class Room
 
     private List<Point> _wallPoints = [];
 
-    public Room(IScreenSurface hostingSurface, List<GameObject> mapObjects)
+    public Room(IScreenSurface hostingSurface, List<GameObject> mapObjects, bool startingRoom)
     {
         _hostingSurface = hostingSurface;
         _mapObjects = mapObjects;
 
-        GenerateRoom();
+        GenerateRoom(startingRoom);
     }
 
     // public bool IsInRoom(Point point) 
@@ -27,7 +27,7 @@ internal class Room
     // TODO might be nice to quickly call something to know if in room (shrug)
     // }
 
-    private void GenerateRoom()
+    private void GenerateRoom(bool isStartingRoom)
     {
         Width = Game.Instance.Random.Next(8, 15);
         Height = Game.Instance.Random.Next(10, 15);
@@ -38,7 +38,7 @@ internal class Room
         for (int i = 0; i < 1000; i++)
         {
             startingPos = new(Game.Instance.Random.Next(0, _hostingSurface.Surface.Width),
-                                        Game.Instance.Random.Next(0, _hostingSurface.Surface.Height));
+                              Game.Instance.Random.Next(0, _hostingSurface.Surface.Height));
 
             if (startingPos.X + Width > _hostingSurface.Surface.Width ||
                 startingPos.Y + Height > _hostingSurface.Surface.Height)
@@ -46,14 +46,18 @@ internal class Room
                 continue;
             }
 
-            if (startingPos.X > _hostingSurface.Surface.Area.Center.X ||
-                startingPos.X + Width < _hostingSurface.Surface.Area.Center.X ||
-                startingPos.Y > _hostingSurface.Surface.Area.Center.Y ||
-                startingPos.Y + Height < _hostingSurface.Surface.Area.Center.Y)
+            if (isStartingRoom &&
+                (
+                    startingPos.X > _hostingSurface.Surface.Area.Center.X ||
+                    startingPos.X + Width < _hostingSurface.Surface.Area.Center.X ||
+                    startingPos.Y > _hostingSurface.Surface.Area.Center.Y ||
+                    startingPos.Y + Height < _hostingSurface.Surface.Area.Center.Y
+                ))
             {
                 continue;
             }
 
+            var innerExit = false;
             // Found starting point, now to make sure our shape fits and isn't hitting anything
             for (var x = startingPos.X; x < startingPos.X + Width; x++)
             {
@@ -62,9 +66,12 @@ internal class Room
                     var nextPos = new Point(x, y);
                     if (_mapObjects.Any(obj => obj.Position == nextPos))
                     {
-                        continue;
+                        innerExit = true;
+                        break;
                     }
                 }
+
+                if (innerExit) break;
             }
 
             // Generate walls now after validation complete
