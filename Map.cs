@@ -14,70 +14,112 @@ internal class Map
 
     public Player UserControlledObject { get; set; }
 
+    private List<Rectangle> _rooms = [];
 
-    public Map(int mapWidth, int mapHeight)
+
+    public Map(int mapWidth, int mapHeight, int rooms)
     {
         _mapSurface = new ScreenSurface(mapWidth, mapHeight)
         {
             UseMouse = false
         };
 
-        var room = new Room(_mapSurface, _mapObjects, true);
-        var room2 = new Room(_mapSurface, _mapObjects, false);
+        for (int x = 0; x < mapWidth; x++)
+        {
+            for (int y = 0; y < mapHeight; y++)
+            {
+                var nextPos = new Point(x, y);
+                var wall = new Wall(nextPos, _mapSurface);
+                _mapObjects.Add(wall);
+            }
+        }
 
-        ConnectRooms(room, room2);
+        // Dig out rooms
+        var generatedRooms = 0;
+        while (generatedRooms < rooms)
+        {
+            var Width = Game.Instance.Random.Next(4, 10);
+            var Height = Game.Instance.Random.Next(6, 10);
+            var startingPos = new Point(Game.Instance.Random.Next(0, _mapSurface.Surface.Width),
+                                        Game.Instance.Random.Next(0, _mapSurface.Surface.Height));
 
-        UserControlledObject = new Player(new ColoredGlyph(Color.White, Color.Black, 2), _mapSurface.Surface.Area.Center, _mapSurface);
+            var startingRect = new Rectangle(startingPos.X, startingPos.Y, Width, Height);
 
-        CreateTreasure(room);
+            if (startingPos.X + Width > _mapSurface.Surface.Width ||
+                    startingPos.Y + Height > _mapSurface.Surface.Height ||
+                    _rooms.Any(r => r.Intersects(startingRect)))
+            {
+                continue;
+            }
+
+            for (int x = startingPos.X; x < startingPos.X + Width; x++)
+            {
+                for (int y = startingPos.Y; y < startingPos.Y + Height; y++)
+                {
+                    var foundObject = _mapObjects.Find(o => o.Position.X == x && o.Position.Y == y);
+
+                    if (foundObject != null) RemoveMapObject(foundObject);
+                }
+            }
+
+            _rooms.Add(startingRect);
+            generatedRooms++;
+        }
+
+        // Now connect the rooms
+        for (var r = 0; r < _rooms.Count; r++)
+        {
+            if (_rooms.Count == 1) continue;
+
+            var rect1 = _rooms[r];
+            var rect2 = _rooms[r];
+
+            if (r == _rooms.Count - 1)
+            {
+                rect1 = _rooms[r - 1];
+                rect2 = _rooms[r];
+            }
+            else
+            {
+                rect2 = _rooms[r + 1];
+            }
+
+            var startingPointX = rect1.Center.X < rect2.Center.X ? rect1.Center.X : rect2.Center.X;
+
+            for (var x = startingPointX; x < startingPointX + Math.Abs(rect1.Center.X - rect2.Center.X); x++)
+            {
+                var foundObject = _mapObjects.Find(o => o.Position.X == x && o.Position.Y == rect1.Center.Y);
+                RemoveMapObject(foundObject);
+            }
+
+            var startingY = rect1.Center.Y < rect2.Center.Y ? rect1.Center.Y : rect2.Center.Y;
+            for (var y = startingY; y < startingY + Math.Abs(rect1.Center.Y - rect2.Center.Y); y++)
+            {
+                var foundObject = _mapObjects.Find(o => o.Position.Y == y && o.Position.X == rect2.Center.X);
+                RemoveMapObject(foundObject);
+            }
+        }
+
+        UserControlledObject = new Player(new ColoredGlyph(Color.White, Color.Black, 2), _rooms[0].Center, _mapSurface);
+
+        CreateTreasure();
         // CreateMonster(room);
 
         UserControlledObject.Health = 10;
     }
 
-    private void ConnectRooms(Room room1, Room room2)
+    private void CreateTreasure()
     {
-        var rect1 = new Rectangle(room1.startingPos.X,
-                                  room1.startingPos.Y,
-                                  room1.Width,
-                                  room1.Height);
-
-
-        var rect2 = new Rectangle(room2.startingPos.X,
-                                  room2.startingPos.Y,
-                                  room2.Width,
-                                  room2.Height);
-
-        for (int x = Math.Min(rect1.Center.X, rect2.Center.X); x <= Math.Max(rect1.Center.X, rect2.Center.X); x++)
+        for (int x = 0; x < _rooms.Count; x++)
         {
-
-            _mapObjects.Add(new Wall(new Point(x, rect1.Center.Y + 1), _mapSurface));
-            RemoveMapObject(_mapObjects.Find(o => o.Position.X == x && o.Position.Y == rect1.Center.Y));
-            _mapObjects.Add(new Wall(new Point(x, rect1.Center.Y - 1), _mapSurface));
-        }
-
-        for (int y = Math.Min(rect1.Center.Y, rect2.Center.Y); y <= Math.Max(rect1.Center.Y, rect2.Center.Y); y++)
-        {
-            _mapObjects.Add(new Wall(new Point(rect2.Center.X + 1, y), _mapSurface));
-            // RemoveMapObject(_mapObjects.Find(x => x.Position.X == r))
-            _mapObjects.Add(new Wall(new Point(rect2.Center.Y - 1, y), _mapSurface));
-
-        }
-    }
-
-    private void CreateTreasure(Room room)
-    {
-        for (int i = 0; i < 1000; i++)
-        {
-            Point randomPosition = new(Game.Instance.Random.Next(room.startingPos.X, room.startingPos.X + room.Width),
-                                        Game.Instance.Random.Next(room.startingPos.Y, room.startingPos.Y + room.Height));
+            Point randomPosition = new(Game.Instance.Random.Next(_rooms[x].X, _rooms[x].X + _rooms[x].Width),
+                                        Game.Instance.Random.Next(_rooms[x].Y, _rooms[x].Y + _rooms[x].Height));
 
             bool foundObject = _mapObjects.Any(obj => obj.Position == randomPosition);
             if (foundObject) continue;
 
             var treasure = new Treasure(randomPosition, _mapSurface, 5);
             _mapObjects.Add(treasure);
-            break;
         }
     }
 
@@ -132,7 +174,7 @@ internal class Map
         return false;
     }
 
-    public void RemoveMapObject(GameObject mapObject)
+    public void RemoveMapObject(GameObject? mapObject)
     {
         if (mapObject == null) return;
 

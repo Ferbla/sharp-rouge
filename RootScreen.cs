@@ -10,7 +10,7 @@ class RootScreen : ScreenObject
 
     public RootScreen()
     {
-        _map = new Map(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY - 5);
+        _map = new Map(Game.Instance.ScreenCellsX, Game.Instance.ScreenCellsY - 5, 3);
 
         _hudSurface = new ScreenSurface(Game.Instance.ScreenCellsX, 5);
         _hudSurface.Surface.DefaultBackground = Color.Purple;
